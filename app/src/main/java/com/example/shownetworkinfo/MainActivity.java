@@ -18,24 +18,34 @@ public class MainActivity extends AppCompatActivity {
 
         TextView detailsActiveNetwork, typeActiveNetwork;
 
-        //Obtain TextViews
         detailsActiveNetwork = findViewById(R.id.detailsActiveNetwork);
         typeActiveNetwork = findViewById(R.id.typeActiveNetwork);
 
-        //Get connectivity service
         ConnectivityManager connectivityManager =  (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
 
-        //Get information of the active Network
         NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
 
-        if (networkInfo == null) {
-            typeActiveNetwork.setText("Any network avaliable");
-        } else if (networkInfo.getType() == connectivityManager.TYPE_WIFI) {
-            typeActiveNetwork.setText("Connected by Wifi");
-        } else if (networkInfo.getType() == connectivityManager.TYPE_MOBILE) {
-            typeActiveNetwork.setText("Connected by Mobile");
-        } else {
-            typeActiveNetwork.setText("Any network connected");
+        if (networkInfo != null) {
+            detailsActiveNetwork.setText(
+                    networkInfo.toString().split(",")[0] + "\n" +
+                    networkInfo.toString().split(",")[1] + "\n" +
+                    networkInfo.toString().split(",")[2] + "\n" +
+                    networkInfo.toString().split(",")[3]);
+
+            if (networkInfo.isConnected()) {
+                if (networkInfo.getType() == connectivityManager.TYPE_WIFI) {
+                    typeActiveNetwork.setText("Wifi connected!");
+                }
+                if (networkInfo.getType() == connectivityManager.TYPE_MOBILE) {
+                    typeActiveNetwork.setText("Mobile connected!");
+                }
+            }
+            else {
+                typeActiveNetwork.setText("No network connected!!");
+            }
+        }
+        else {
+            typeActiveNetwork.setText("No network operating!!");
         }
     }
 }
