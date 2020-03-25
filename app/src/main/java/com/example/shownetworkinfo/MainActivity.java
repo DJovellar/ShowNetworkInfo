@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.widget.TextView;
 
@@ -16,36 +17,55 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        TextView detailsActiveNetwork, typeActiveNetwork;
+        //Call AsynTask for check the network
+        new UpdateNetworkInformationTask().execute();
+    }
 
-        detailsActiveNetwork = findViewById(R.id.detailsActiveNetwork);
-        typeActiveNetwork = findViewById(R.id.typeActiveNetwork);
+    private class UpdateNetworkInformationTask extends AsyncTask<Void, Void, String[]> {
 
-        ConnectivityManager connectivityManager =  (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
+        @Override
+        protected String[] doInBackground(Void... voids) {
 
-        NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
+            String[] result = new String[2];
 
-        if (networkInfo != null) {
-            detailsActiveNetwork.setText(
-                    networkInfo.toString().split(",")[0] + "\n" +
-                    networkInfo.toString().split(",")[1] + "\n" +
-                    networkInfo.toString().split(",")[2] + "\n" +
-                    networkInfo.toString().split(",")[3]);
+            ConnectivityManager connectivityManager =  (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
 
-            if (networkInfo.isConnected()) {
-                if (networkInfo.getType() == connectivityManager.TYPE_WIFI) {
-                    typeActiveNetwork.setText("Wifi connected!");
+            NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
+
+            if (networkInfo != null) {
+                result[0] = networkInfo.toString().split(",")[0] + "\n" +
+                        networkInfo.toString().split(",")[1] + "\n" +
+                        networkInfo.toString().split(",")[2] + "\n" +
+                        networkInfo.toString().split(",")[3];
+
+                if (networkInfo.isConnected()) {
+                    if (networkInfo.getType() == connectivityManager.TYPE_WIFI) {
+                        result[1] = "Wifi connected!";
+                    }
+                    if (networkInfo.getType() == connectivityManager.TYPE_MOBILE) {
+                        result[1] = "Mobile connected!";
+                    }
                 }
-                if (networkInfo.getType() == connectivityManager.TYPE_MOBILE) {
-                    typeActiveNetwork.setText("Mobile connected!");
+                else {
+                    result[1] = "No network connected!!";
                 }
             }
             else {
-                typeActiveNetwork.setText("No network connected!!");
+                result[0] = "No details avaliable!!";
+                result[1] = "No network operating!!";
             }
+            return result;
         }
-        else {
-            typeActiveNetwork.setText("No network operating!!");
+
+        @Override
+        protected void onPostExecute(String[] result) {
+            TextView detailsActiveNetwork, typeActiveNetwork;
+
+            detailsActiveNetwork = findViewById(R.id.detailsActiveNetwork);
+            typeActiveNetwork = findViewById(R.id.typeActiveNetwork);
+
+            detailsActiveNetwork.setText(result[0]);
+            typeActiveNetwork.setText(result[1]);
         }
     }
 }
