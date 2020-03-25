@@ -17,7 +17,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        //Call AsynTask for check the network
+        //Call AsynTask to check the network in Background
         new UpdateNetworkInformationTask().execute();
     }
 
